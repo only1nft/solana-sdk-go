@@ -144,12 +144,27 @@ func WatchForOwnershipTransfer(ctx context.Context, conn *rpc.Client, wsConn *ws
 		return false, fmt.Errorf("failed to subscribe to account: %v", err)
 	}
 
+	pSuccess := make(chan bool, 1)
+	go func() {
+		for {
+			success, _ := FindOwnershipTransfer(ctx, conn, publicKey, amount)
+			if success {
+				pSuccess <- true
+
+				break
+			}
+			time.Sleep(time.Second * 5)
+		}
+	}()
+
 	defer sub.Unsubscribe()
 
 	for {
 		select {
 		case <-ctx.Done():
 			return false, nil
+		case <-pSuccess:
+			return true, nil
 		default:
 			if _, err = sub.Recv(); err != nil {
 				return false, fmt.Errorf("failed to receive account sub data: %v", err)
