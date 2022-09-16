@@ -3,7 +3,7 @@ module github.com/only1nft/solana-sdk-go
 go 1.17
 
 require (
-	github.com/gagliardetto/binary v0.5.0
+	github.com/gagliardetto/binary v0.7.1
 	github.com/gagliardetto/solana-go v1.0.2
 )
 
